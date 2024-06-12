@@ -7,14 +7,13 @@ interface DraggableTextProps {
   fontFamily: string,
   fontSize: number,
   fill: string,
-  image: string,
   type: string
 }
 
-const DraggableText: React.FC<DraggableTextProps> = ({ data, fontFamily, fontSize, fill, image, type }) => {
+const DraggableText: React.FC<DraggableTextProps> = ({ data, fontFamily, fontSize, fill, type }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemType.TEXT,
-    item: { data, fontFamily, fontSize, fill, image, type },
+    item: { data, fontFamily, fontSize, fill, type },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -22,7 +21,13 @@ const DraggableText: React.FC<DraggableTextProps> = ({ data, fontFamily, fontSiz
 
   return (
       <div className="flex items-center" ref={drag}>
-        <img className="h-8 w-auto" src={image} alt={data} />
+        {/* <div className={`  text-[${fill}] text-[${fontSize}px]`}>{data}</div> */}
+        <div style={{
+          fontFamily : fontFamily,
+          color: fill,
+          fontSize: fontSize
+          }}>{data}</div>
+        {/* <img className="h-8 w-auto" src={image} alt={data} /> */}
       </div>
   );
 };

@@ -28,14 +28,16 @@ interface FabricCanvasProp {
     initData: string,
     sampleTexts: SampleText[],
     sampleImages: SampleImage[],
-    listFonts: SampleFont[]
+    listFonts: SampleFont[],
+    size:{width:number,heigh:number},
 }
 
 const FabricCanvas: React.FC<FabricCanvasProp> = ({
     initData,
     sampleTexts,
     listFonts,
-    sampleImages
+    sampleImages,
+    size,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas>();
@@ -92,7 +94,7 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
                 const font = new FontFace(e.fontName, `url(${e.fontFile})`);
                 font.load().then((loadedFont) => {
                     // Add the font to the document
-                    // document.fonts.load(loadedFont);
+                    (document.fonts as any).add(loadedFont);
                 }).catch((error) => {
                     console.error('Failed to load font:', error);
                 });
@@ -130,7 +132,8 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
                         updatePosition(activeObject)
                     }
                     if (target.canvas) {
-                        console.log(target.canvas.getObjects().indexOf(target))
+                        target.moveTo(target.canvas.getObjects().indexOf(target));
+                        // console.log(target.canvas.getObjects().indexOf(target))
                     }
                 }
 
@@ -141,24 +144,7 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
             fabricCanvasRef.current?.on('selection:cleared', () => {
                 clear();
             });
-            fabricCanvasRef.current?.on('object:moving', (e) => {
-                const target = e.target;
-
-                if (target) {
-                    if (target.type === 'i-text') {
-                        const activeObject = target as fabric.IText;
-                        updatePosition(activeObject)
-                    }
-                    if (target.type === 'image') {
-                        const activeObject = target as fabric.Image;
-                        updatePosition(activeObject)
-                    }
-                    if (target.canvas) {
-                        target.moveTo(target.canvas.getObjects().indexOf(target));
-                        console.log(target.canvas.getObjects().indexOf(target))
-                    }
-                }
-            });
+            fabricCanvasRef.current?.on('object:moving', handleSelection);
             // Prevent objects from being brought to the front when dragged
             // fabricCanvasRef.current.on('object:moving', (event) => {
             //     const activeObject = event.target;
@@ -174,7 +160,6 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
         drop: (item, monitor) => {
             const clientOffset = monitor.getClientOffset();
             if (clientOffset && fabricCanvasRef.current) {
-                console.log(item)
                 const currentItem = item as CommonDragDropItem
                 if (currentItem.type === 'text') {
                     const textItem = item as TextItem
@@ -231,7 +216,9 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
                         sampleTexts={sampleTexts}
                         sampleImages={sampleImages}
                     />
-                    <canvas ref={canvasRef} width={1280} height={720} />
+                    <div className="rounded shadow-lg border border-gray-200 ">
+                        <canvas ref={canvasRef} width={size.width} height={size.heigh} />
+                    </div>
                 </div>
 
                 {popupPosition && (
