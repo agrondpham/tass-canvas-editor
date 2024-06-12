@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { useDrop } from 'react-dnd';
 import Toolbar from '../toolbar/ToolBar';
@@ -9,6 +9,9 @@ import SampleFont from '../common/SampleFont';
 import SampleImage from '../common/SampleImage';
 import ContextMenu from '../toolbar/ContextMenu';
 
+export interface FabricCanvasRef {
+    exportToJson: () => string;
+}
 interface ImageItem {
     data: string,
     type: string
@@ -29,16 +32,17 @@ interface FabricCanvasProp {
     sampleTexts: SampleText[],
     sampleImages: SampleImage[],
     listFonts: SampleFont[],
-    size:{width:number,heigh:number},
+    size: { width: number, heigh: number },
 }
 
-const FabricCanvas: React.FC<FabricCanvasProp> = ({
+
+const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     initData,
     sampleTexts,
     listFonts,
     sampleImages,
     size,
-}) => {
+}, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas>();
     const [editingItem, setEditingItem] = useState<fabric.IText | fabric.Image | null>(null);
@@ -49,6 +53,13 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
         setEditingItem(null);
         setPopupPosition(null);
     }
+    useImperativeHandle(ref, () => ({
+        exportToJson(){
+            const abc = fabricCanvasRef.current as fabric.Canvas
+            var json_data = JSON.stringify(abc.toDatalessJSON())
+            return json_data;
+        }
+    }));
     const handleRightClick = (event: MouseEvent) => {
         event.preventDefault();
         const pointer = fabricCanvasRef.current?.getPointer(event);
@@ -66,6 +77,7 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
                 fireRightClick: true,  // <-- enable firing of right click events
                 fireMiddleClick: true, // <-- enable firing of middle click events
                 stopContextMenu: true,
+                preserveObjectStacking: true
             });
             //handle rightclick
             fabricCanvasRef.current.on('mouse:down:before', (event) => {
@@ -238,6 +250,6 @@ const FabricCanvas: React.FC<FabricCanvasProp> = ({
             </div>
         </>
     );
-};
+});
 
 export default FabricCanvas;

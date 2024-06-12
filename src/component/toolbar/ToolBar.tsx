@@ -202,7 +202,7 @@ const Toolbar: React.FC<TextEditorProps> = ({
                         <div className='pl-2 pr-3 py-1 h-full flex items-center'>
                             <select value={currentFontFamily ? currentFontFamily : 'Times New Roman'} onChange={(e) => handleFontFamilyChange(e.target.value)}>
                                 {fonts?.map((family) => (
-                                    <option key={family} value={family}>
+                                    <option key={family} value={family} style={{fontFamily:family}}>
                                         {family}
                                     </option>
                                 ))}

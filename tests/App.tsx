@@ -1,8 +1,7 @@
-import React from 'react';
-import CanvasEditor from '../src/index';
+import React, { useRef } from 'react';
+import CanvasEditor, { CanvasEditorRef } from '../src/index';
 
 function App() {
-
     const textList = [
         {
           data: 'Happy Holiday',
@@ -47,12 +46,21 @@ function App() {
         { fontName: 'Helveticrap', fontFile: './assets/fonts/Helveticrap.ttf' },
         { fontName: 'Hagrid-Italic', fontFile: './assets/fonts/Hagrid-Italic-trial.ttf' },
         { fontName: 'Brig Maven', fontFile: './assets/fonts/Brig_Maven.ttf' },
-        { fontName: 'Sansitype Script', fontFile: './assets/fonts/Sansitype_Script.otf' }
+        { fontName: 'Sansitype Script', fontFile: './assets/fonts/Sansitype_Script.otf' },
+        { fontName: 'Master Of Break', fontFile: './assets/fonts/master_of_break.ttf' }
       ]
       const size = {width:1024,heigh:640}
+      const canvasEditorRef = useRef<CanvasEditorRef>(null);
+  
+      const handleGetCount = () => {
+        if (canvasEditorRef.current) {
+          console.log(canvasEditorRef.current.exportToJson());
+        }
+      };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-row">
-      <CanvasEditor fontList={fontList} textList={textList} size={size} />
+      <CanvasEditor ref={canvasEditorRef} fontList={fontList} textList={textList} size={size} />
+      <button onClick={handleGetCount}>Click</button>
     </div>
   );
 }
