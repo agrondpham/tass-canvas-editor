@@ -4,24 +4,15 @@ import {Image } from 'fabric/fabric-impl';
 import UploadImageButton from '../button/UploadImage';
 import SaveToImage from '../button/SaveToImage';
 import DetailSidebar from '../sidebar/DetailSidebar';
-import SampleText from '../common/SampleText';
-import SampleImage from '../common/SampleImage';
 import ExportButton from '../button/ExportButton';
+import { ImageItem, TextItem } from '../common/SampleData';
 
-// interface TextToolbarProps {
-//     onFontSizeChange: (size: number) => void;
-//     onFontFamilyChange: (family: string) => void;
-//     onBold: () => void;
-//     onItalic: () => void;
-//     currentFontSize: number;
-//     currentFontFamily: string;
-// }
 interface TextEditorProps {
     editingItem: fabric.IText | fabric.Image | null,
     currentFabricCanvas: fabric.Canvas | undefined,
     fonts: string[] | undefined
-    sampleTexts: SampleText[] | undefined
-    sampleImages: SampleImage[]| undefined
+    sampleTexts: TextItem[] | []
+    sampleImages: ImageItem[]| []
 }
 
 const Toolbar: React.FC<TextEditorProps> = ({

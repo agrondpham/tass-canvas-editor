@@ -1,16 +1,12 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import ItemType from '../common/ItemType';
+import { ImageItem } from '../common/SampleData';
 
-interface DraggableImageProps {
-  data: string,
-  type: string
-}
-
-const DraggableImage: React.FC<DraggableImageProps> = ({ data,type }) => {
+const DraggableImage: React.FC<ImageItem> = (imageItemInfo:ImageItem) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemType.TEXT,
-    item: { data ,type},
+    item: imageItemInfo,
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -18,7 +14,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ data,type }) => {
 
   return (
       <div className="flex items-center" ref={drag}>
-        <img className="h-8 w-auto" src={data} />
+        <img className="h-8 w-auto" src={imageItemInfo.image} alt={imageItemInfo.data} />
       </div>
   );
 };

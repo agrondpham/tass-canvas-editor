@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import DraggableText from '../drap-drop/DraggableText';
-import SampleText from '../common/SampleText';
-import SampleImage from '../common/SampleImage';
 import DraggableImage from '../drap-drop/DraggableImage';
+import { ImageItem, TextItem } from '../common/SampleData';
 
 interface DetailSidebarProp {
     type: string
-    sampleTexts: SampleText[] | undefined
-    sampleImages: SampleImage[] | undefined
+    sampleTexts?: TextItem[] | []
+    sampleImages?: ImageItem[] | []
 };
 const DetailSidebar: React.FC<DetailSidebarProp> = ({
     type,
-    sampleTexts,
-    sampleImages
+    sampleTexts = [],
+    sampleImages = []
 }) => {
     const [typeOfDetailSideBar, setTypeOfDetailSideBar] = useState<string>(type);
     useEffect(() => {
@@ -25,9 +24,9 @@ const DetailSidebar: React.FC<DetailSidebarProp> = ({
                     {typeOfDetailSideBar === 'text' && (
                         <div className='flow-root'>
                             <ul className='divide-y divide-gray-200 dark:divide-gray-700'>
-                                {sampleTexts?.map((textItem, i) => (
+                                {sampleTexts?.map((item, i) => (
                                     <li className="py-3 sm:py-4" key={i}>
-                                        <DraggableText data={textItem.data} fontFamily={textItem.fontFamily} fontSize={textItem.fontSize} fill={textItem.fill} type={textItem.type} />
+                                        <DraggableText {...item}  />
                                     </li>
                                 ))
                                 }
@@ -36,9 +35,9 @@ const DetailSidebar: React.FC<DetailSidebarProp> = ({
                     {typeOfDetailSideBar === 'image' && (
                         <div className='flow-root'>
                             <ul className='divide-y divide-gray-200 dark:divide-gray-700'>
-                                {sampleImages?.map((textItem, i) => (
+                                {sampleImages?.map((item, i) => (
                                     <li className="py-3 sm:py-4" key={i}>
-                                        <DraggableImage data={textItem.image} type={textItem.type} />
+                                        <DraggableImage {...item} />
                                     </li>
                                 ))
                                 }

@@ -1,19 +1,13 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import ItemType from '../common/ItemType';
+import { TextItem } from '../common/SampleData';
 
-interface DraggableTextProps {
-  data: string,
-  fontFamily: string,
-  fontSize: number,
-  fill: string,
-  type: string
-}
-
-const DraggableText: React.FC<DraggableTextProps> = ({ data, fontFamily, fontSize, fill, type }) => {
+// const DraggableText: React.FC<DraggableTextProps> = ({ data, fontFamily, fontSize, fill, type }) => {
+const DraggableText: React.FC<TextItem> = (textItemInfo:TextItem) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemType.TEXT,
-    item: { data, fontFamily, fontSize, fill, type },
+    item: textItemInfo,
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -23,10 +17,10 @@ const DraggableText: React.FC<DraggableTextProps> = ({ data, fontFamily, fontSiz
       <div className="flex items-center" ref={drag}>
         {/* <div className={`  text-[${fill}] text-[${fontSize}px]`}>{data}</div> */}
         <div style={{
-          fontFamily : fontFamily,
-          color: fill,
-          fontSize: fontSize
-          }}>{data}</div>
+          fontFamily : textItemInfo.fontFamily,
+          color: textItemInfo.fill,
+          fontSize: textItemInfo.fontSize
+          }}>{textItemInfo.data}</div>
         {/* <img className="h-8 w-auto" src={image} alt={data} /> */}
       </div>
   );

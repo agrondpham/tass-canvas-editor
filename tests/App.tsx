@@ -9,7 +9,8 @@ function App() {
           fontSize: 36,
           fill: 'red',
           image: '/assets/images/happyholiday.png',
-          type: 'text'
+          type: 'text',
+          editable: false
         },
         {
           data: 'Holiday in your heart',
@@ -17,15 +18,17 @@ function App() {
           fontSize: 24,
           fill: 'black',
           image: '/assets/images/happyholiday.png',
-          type: 'text'
+          type: 'text',
+          editable: false
         },
         {
-          data: 'Happy Holiday',
+          data: 'student_name',
           fontFamily: 'Deja Vu',
           fontSize: 18,
           fill: 'black',
           image: '/assets/images/happyholiday.png',
-          type: 'text'
+          type: 'text',
+          editable: true
         },
         {
           data: 'Happy Holiday',
@@ -33,7 +36,8 @@ function App() {
           fontSize: 5,
           fill: 'black',
           image: '/assets/images/happyholiday.png',
-          type: 'text'
+          type: 'text',
+          editable: false
         },
       ]
       const fontList = [

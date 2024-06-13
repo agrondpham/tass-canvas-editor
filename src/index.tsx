@@ -1,15 +1,16 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import FabricCanvas, { FabricCanvasRef } from './component/canvas-editor/FabricCanvas';
 import DragDropProvider from './component/drap-drop/DndProvider';
+import { ImageItem, SampleFont, TextItem } from './component/common/SampleData';
 
 // import './index.css';
 export interface CanvasEditorRef {
   exportToJson: () => string;
 }
 interface CanvasEditorProps {
-  fontList?: any | [],
-  textList?: any | [],
-  imageList?: any | [],
+  fontList?: SampleFont[] | [],
+  textList?: TextItem[] | [],
+  imageList?: ImageItem[] | [],
   jsonData?: string
   size?: { width: number, heigh: number }
 }

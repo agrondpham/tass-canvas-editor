@@ -4,24 +4,11 @@ import { useDrop } from 'react-dnd';
 import Toolbar from '../toolbar/ToolBar';
 import PopupSidebar from '../sidebar/PopupSidebar';
 import ItemType from '../common/ItemType';
-import SampleText from '../common/SampleText';
-import SampleFont from '../common/SampleFont';
-import SampleImage from '../common/SampleImage';
 import ContextMenu from '../toolbar/ContextMenu';
+import { ImageItem, SampleFont, TextItem } from '../common/SampleData';
 
 export interface FabricCanvasRef {
     exportToJson: () => string;
-}
-interface ImageItem {
-    data: string,
-    type: string
-}
-interface TextItem {
-    data: string,
-    fontFamily: string,
-    fontSize: number,
-    fill: string,
-    type: string
 }
 interface CommonDragDropItem {
     data: string,
@@ -29,8 +16,8 @@ interface CommonDragDropItem {
 }
 interface FabricCanvasProp {
     initData: string,
-    sampleTexts: SampleText[],
-    sampleImages: SampleImage[],
+    sampleTexts: TextItem[],
+    sampleImages: ImageItem[],
     listFonts: SampleFont[],
     size: { width: number, heigh: number },
 }
@@ -54,7 +41,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
         setPopupPosition(null);
     }
     useImperativeHandle(ref, () => ({
-        exportToJson(){
+        exportToJson() {
             const abc = fabricCanvasRef.current as fabric.Canvas
             var json_data = JSON.stringify(abc.toDatalessJSON())
             return json_data;
@@ -130,6 +117,13 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
         });
     }
     useEffect(() => {
+        if (initData && fabricCanvasRef.current ) {
+            fabricCanvasRef.current.loadFromJSON(JSON.parse(initData), () => {
+                fabricCanvasRef.current?.renderAll();
+            })
+        }
+    },[initData])
+    useEffect(() => {
         if (canvasRef.current) {
             const handleSelection = (e: fabric.IEvent) => {
                 clear();
@@ -178,6 +172,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
                     const boundingRect = canvasRef.current!.getBoundingClientRect();
                     const x = clientOffset.x - boundingRect.left;
                     const y = clientOffset.y - boundingRect.top;
+                    // debugger
 
                     const text = new fabric.IText(textItem.data, {
                         left: x,
@@ -187,10 +182,13 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
                         fill: textItem.fill,
                         selectable: true,
                         hasControls: true,
-                        lockScalingFlip: true, // Prevent scaling flip
-                        lockRotation: false,   // Allow rotation
+                        lockScalingFlip: false, // Prevent scaling flip
+                        lockRotation: true,   // Allow rotation
+                        editable: textItem.editable
                     });
                     fabricCanvasRef.current.add(text);
+
+
                 }
                 if (currentItem.type === 'image') {
                     const imageItem = item as ImageItem
