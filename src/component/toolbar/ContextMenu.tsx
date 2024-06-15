@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { deleteSelectedObjects, parseSelectedObjects } from '../common/FuncCopyParseDelete';
 type ContextMenuProps = {
     currentFabricCanvas: fabric.Canvas | undefined,
     x: number;
     y: number;
     show: boolean;
     onClose: () => void;
+    clipboard: fabric.Object[] | null
+    setClipboard:(data:fabric.Object[])=>void
 };
-const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose }) => {
-    const [clipboard, setClipboard] = useState<fabric.Object | null>(null);
+const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose,clipboard,setClipboard }) => {
+    // const [clipboard, setClipboard] = useState<fabric.Object | null>(null);
 
     if (!show) return null;
     const bringToForward = () => {
@@ -31,50 +34,23 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
     };
     const handleCopy = () => {
         if (currentFabricCanvas) {
-            const activeObject = currentFabricCanvas.getActiveObject();
-            if (activeObject) {
-                activeObject.clone((cloned: fabric.Object) => {
-                    setClipboard(cloned);
-                });
-            }
+            const activeObject = currentFabricCanvas.getActiveObjects();
+                setClipboard(activeObject);
+            
         }
     };
     const handleDelete = () => {
         if (currentFabricCanvas) {
-            const activeObject = currentFabricCanvas.getActiveObjects();
-            if (activeObject) {
-                activeObject.forEach((deleteObject: fabric.Object) => {
-                    currentFabricCanvas?.remove(deleteObject);
-                });
-                currentFabricCanvas?.renderAll();
-            }
+            deleteSelectedObjects(currentFabricCanvas)
         }
     };
     const handlePaste = () => {
         if (currentFabricCanvas && clipboard) {
-            clipboard.clone((clonedObj: fabric.Object) => {
-                currentFabricCanvas.discardActiveObject();
-                clonedObj.set({
-                    left: x,
-                    top: y,
-                    evented: true,
-                });
-                // if (clonedObj.type === 'activeSelection') {
-                //   // Active selection needs a reference to the canvas.
-                //   clonedObj.canvas = currentFabricCanvas;
-                //   clonedObj.forEachObject((obj: fabric.Object) => {
-                //     currentFabricCanvas.add(obj);
-                //   });
-                //   clonedObj.setCoords();
-                // } else {
-                currentFabricCanvas.add(clonedObj);
-                // }
-                setClipboard(clonedObj);
-                currentFabricCanvas.setActiveObject(clonedObj);
-                currentFabricCanvas.requestRenderAll();
-            });
+            parseSelectedObjects(clipboard, currentFabricCanvas)
         }
     };
+    
+
     const menuItems = [
         {
             label: 'Copy',

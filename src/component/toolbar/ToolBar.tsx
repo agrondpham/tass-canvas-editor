@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import ColorButton from '../button/ColorButton';
-import {Image } from 'fabric/fabric-impl';
+import { Image } from 'fabric/fabric-impl';
 import UploadImageButton from '../button/UploadImage';
 import SaveToImage from '../button/SaveToImage';
-import DetailSidebar from '../sidebar/DetailSidebar';
 import ExportButton from '../button/ExportButton';
 import { ImageItem, TextItem } from '../common/SampleData';
+import DraggableText from '../drap-drop/DraggableText';
+import DraggableImage from '../drap-drop/DraggableImage';
 
 interface TextEditorProps {
-    editingItem: fabric.IText | fabric.Image | null,
-    currentFabricCanvas: fabric.Canvas | undefined,
+    editingItem: fabric.Object | null
+    currentFabricCanvas: fabric.Canvas | undefined
     fonts: string[] | undefined
     sampleTexts: TextItem[] | []
-    sampleImages: ImageItem[]| []
+    sampleImages: ImageItem[] | []
+    setSelectedItem: (item: TextItem) => void
+    showDropdown:string,
+    setShowDropdown:(type:string)=>void
 }
 
 const Toolbar: React.FC<TextEditorProps> = ({
@@ -20,8 +24,12 @@ const Toolbar: React.FC<TextEditorProps> = ({
     currentFabricCanvas,
     fonts,
     sampleTexts,
-    sampleImages
+    sampleImages,
+    setSelectedItem,
+    showDropdown,
+    setShowDropdown
 }) => {
+    // const [selectedItem, setSelectedItem] = useState<string[]>();
     const [currentFontSize, setCurrentFontSize] = useState<number>(20);
     const [currentFontFamily, setCurrentFontFamily] = useState<string>('TimeNewRoman');
     const [currentColor, setCurrentColor] = useState<string>('#000000');
@@ -31,91 +39,93 @@ const Toolbar: React.FC<TextEditorProps> = ({
     const [textItalic, setTextItalic] = useState<boolean>();
     const [textUpper, setTextUpper] = useState<boolean>();
     const [textAlign, setTextAlign] = useState<string>();
-    const [openMenuDetail, setOpenMenuDetail] = useState<string>('');
+    // const [openMenuDetail, setOpenMenuDetail] = useState<string>('');
 
-    const openDetailMenu = (type: string) => {
-
-        openMenuDetail === type ? setOpenMenuDetail('') : setOpenMenuDetail(type)
-
+    const handleOpenDropdownMenu = (type: string) => {
+        showDropdown === type ? setShowDropdown('') : setShowDropdown(type)
     }
 
     const handleFontSizeChange = (size: number) => {
-        if (editingItem && editingItem.type === 'i-text') {
-            editingItem = editingItem as fabric.IText
-            editingItem.set('fontSize', currentFontSize + size);
-            currentFabricCanvas?.renderAll();
-            setCurrentFontSize(currentFontSize + size);
+        if (editingItem) {
+            if (editingItem.type === 'textbox' || editingItem.type === 'i-text') {
+                const item = editingItem as fabric.Textbox
+                item.set('fontSize', currentFontSize + size);
+                currentFabricCanvas?.renderAll();
+                setCurrentFontSize(currentFontSize + size);
+            }
         }
     };
     const handleFontFamilyChange = (family: string) => {
-        if (editingItem && editingItem.type === 'i-text') {
-            editingItem = editingItem as fabric.IText
-            editingItem.set('fontFamily', family);
-            currentFabricCanvas?.renderAll();
-            setCurrentFontFamily(family)
+        if (editingItem) {
+            if (editingItem.type === 'textbox' || editingItem.type === 'i-text') {
+                const item = editingItem as fabric.Textbox
+                item.set('fontFamily', family);
+                currentFabricCanvas?.renderAll();
+                setCurrentFontFamily(family)
+            }
         }
     };
     const changeColor = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (editingItem && editingItem.type === 'i-text') {
-            editingItem = editingItem as fabric.IText
-            editingItem.set('fill', e.target.value);
+        if (editingItem && (editingItem.type === 'textbox' || editingItem.type === 'i-text')) {
+            const item = editingItem as fabric.Textbox
+            item.set('fill', e.target.value);
             currentFabricCanvas?.renderAll();
             setCurrentColor(e.target.value)
         }
     }
     const handleTextAlign = (align: string) => {
-        if (editingItem && editingItem.type === 'i-text') {
-            editingItem = editingItem as fabric.IText
-            editingItem.set('textAlign', align);
+        if (editingItem && (editingItem.type === 'textbox' || editingItem.type === 'i-text')) {
+            const item = editingItem as fabric.Textbox
+            item.set('textAlign', align);
             currentFabricCanvas?.renderAll();
             setTextAlign(align)
         }
     }
     const handleTextStyle = (type: string) => {
-        if (editingItem && editingItem.type === 'i-text') {
-            editingItem = editingItem as fabric.IText
+        if (editingItem && (editingItem.type === 'textbox' || editingItem.type === 'i-text')) {
+            const item = editingItem as fabric.Textbox
             switch (type) {
                 case 's':
-                    if (editingItem.linethrough) {
-                        editingItem.set('linethrough', false);
+                    if (item.linethrough) {
+                        item.set('linethrough', false);
                         setTextLineThrought(false)
                     } else {
-                        editingItem.set('linethrough', true);
+                        item.set('linethrough', true);
                         setTextLineThrought(true)
                     }
                     break;
                 case 'u':
-                    if (editingItem.underline) {
-                        editingItem.set('underline', false);
+                    if (item.underline) {
+                        item.set('underline', false);
                         setTextUnderline(false);
                     } else {
-                        editingItem.set('underline', true);
+                        item.set('underline', true);
                         setTextUnderline(true);
                     }
                     break;
                 case 'i':
-                    if (editingItem.fontStyle === 'italic') {
-                        editingItem.set('fontStyle', 'normal');
+                    if (item.fontStyle === 'italic') {
+                        item.set('fontStyle', 'normal');
                         setTextItalic(false);
                     } else {
-                        editingItem.set('fontStyle', 'italic');
+                        item.set('fontStyle', 'italic');
                         setTextItalic(true);
                     }
                     break;
                 case 'b':
-                    if (editingItem.fontWeight === 'bold') {
-                        editingItem.set('fontWeight', 'normal');
+                    if (item.fontWeight === 'bold') {
+                        item.set('fontWeight', 'normal');
                         setTextBold(false);
                     } else {
-                        editingItem.set('fontWeight', 'bold');
+                        item.set('fontWeight', 'bold');
                         setTextBold(true);
                     }
                     break;
                 case 'a':
-                    const currentText = editingItem?.text;
+                    const currentText = item?.text;
                     const isUpperCase = currentText === currentText?.toUpperCase();
                     const newText = isUpperCase ? currentText?.toLowerCase() : currentText?.toUpperCase();
-                    editingItem.set('text', newText);
+                    item.set('text', newText);
                     setTextUpper(!isUpperCase)
                     break;
 
@@ -126,27 +136,27 @@ const Toolbar: React.FC<TextEditorProps> = ({
     }
     const handleImageFlip = (flipDirect: keyof Image) => {
         if (editingItem && editingItem.type === 'image') {
-            editingItem = editingItem as fabric.Image
-            editingItem.toggle(flipDirect);
+            const item = editingItem as fabric.Image
+            item.toggle(flipDirect);
             currentFabricCanvas?.renderAll();
         }
     };
 
     useEffect(() => {
         if (editingItem) {
-            if (editingItem.type === 'i-text') {
-                editingItem = editingItem as fabric.IText;
-                setCurrentFontFamily(editingItem?.fontFamily as string)
-                setCurrentFontSize(editingItem?.fontSize as number)
-                setCurrentColor(editingItem?.fill as string)
-                setTextBold(editingItem.fontWeight === 'bold')
-                setTextItalic(editingItem.fontStyle === 'italic')
-                setTextLineThrought(editingItem.linethrough)
-                setTextUnderline(editingItem.underline)
-                const currentText = editingItem?.text;
+            if (editingItem.type === 'textbox' || editingItem.type === 'i-text') {
+                const item = editingItem as fabric.Textbox
+                setCurrentFontFamily(item?.fontFamily as string)
+                setCurrentFontSize(item?.fontSize as number)
+                setCurrentColor(item?.fill as string)
+                setTextBold(item.fontWeight === 'bold')
+                setTextItalic(item.fontStyle === 'italic')
+                setTextLineThrought(item.linethrough)
+                setTextUnderline(item.underline)
+                const currentText = item?.text;
                 const isUpperCase = currentText === currentText?.toUpperCase();
                 setTextUpper(isUpperCase)
-                setTextAlign(editingItem.textAlign)
+                setTextAlign(item.textAlign)
             }
         }
 
@@ -155,7 +165,33 @@ const Toolbar: React.FC<TextEditorProps> = ({
     return (
         <div className='flex grap-2 py-2'>
             <div className='rounded flex items-center shadow-lg border border-gray-200 text-gray-700 bg-white py-2'>
-                <DetailSidebar type={openMenuDetail} sampleTexts={sampleTexts} sampleImages={sampleImages}/>
+                {showDropdown ==='text'&& sampleTexts.length>0 && (
+                    <div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 mt-14 absolute top-0 z-10">
+
+                        <div className='flow-root'>
+                            <ul className='divide-y divide-gray-200 dark:divide-gray-700'>
+                                {sampleTexts.map((item, i) => (
+                                    <li className="py-3 sm:py-4" key={i}>
+                                        <DraggableText item={item} setSelectedItem={setSelectedItem} setShowDropdown={setShowDropdown} />
+                                    </li>
+                                ))
+                                }
+                            </ul>
+                        </div>
+                    </div>)}
+                {showDropdown ==='image' && sampleImages.length>0 && (
+                    <div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 mt-14 absolute top-0 z-10">
+                        <div className='flow-root'>
+                            <ul className='divide-y divide-gray-200 dark:divide-gray-700'>
+                                {sampleImages.map((item, i) => (
+                                    <li className="py-3 sm:py-4" key={i}>
+                                        <DraggableImage {...item} />
+                                    </li>
+                                ))
+                                }
+                            </ul>
+                        </div>
+                    </div>)}
                 <div className='mx-1 w-8 h-8 cursor-pointer select-none font-bold hover:bg-gray-200 flex rounded`'>
                     <SaveToImage currentFabricCanvas={currentFabricCanvas} />
                 </div>
@@ -163,13 +199,13 @@ const Toolbar: React.FC<TextEditorProps> = ({
                     <ExportButton currentFabricCanvas={currentFabricCanvas} />
                 </div>
 
-                <div onClick={() => openDetailMenu('text')}
+                <div onClick={() => handleOpenDropdownMenu('text')}
                     className="mx-1 w-8 h-8 cursor-pointer select-none font-bold hover:bg-gray-200 flex rounded"
                 >
                     <i className="fa-solid fa-text mx-auto my-auto" ></i>
                 </div>
 
-                <div onClick={() => openDetailMenu('image')}
+                <div onClick={() => handleOpenDropdownMenu('image')}
                     className="mx-1 w-8 h-8 cursor-pointer select-none font-bold hover:bg-gray-200 flex rounded"
                 >
                     <i className="fa-regular fa-image mx-auto my-auto"></i>
@@ -177,23 +213,23 @@ const Toolbar: React.FC<TextEditorProps> = ({
                 <div className='mx-1 w-8 h-8 cursor-pointer select-none font-bold hover:bg-gray-200 flex rounded`'>
                     <UploadImageButton currentFabricCanvas={currentFabricCanvas} />
                 </div>
-                
-                {editingItem?.type === 'i-text' && (
+
+                {(editingItem?.type === 'textbox' || editingItem?.type === 'i-text') && (
                     <>
                         <div className='relative flex items-center max-w-[8rem]'>
                             <button type='button' onClick={(e) => handleFontSizeChange(-1)} id='decrement-button' data-input-counter-decrement='quantity-input' className=' w-8 h-8 flex bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-s-lg focus:ring-gray-100  focus:ring-2 focus:outline-none'>
                                 <i className="fa-solid fa-minus  mx-auto my-auto"></i>
                             </button>
-                            <input type='text' id='quantity-input' data-input-counter aria-describedby='helper-text-explanation' className=' w-8 h-8 bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block py-2.5 ' value={currentFontSize ? currentFontSize : 20} required />
+                            <input type='text' id='quantity-input' data-input-counter aria-describedby='helper-text-explanation' className=' w-8 h-8 bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block py-2.5 ' defaultValue={currentFontSize ? currentFontSize : 20} required />
                             <button type='button' onClick={(e) => handleFontSizeChange(+1)} id='increment-button' data-input-counter-increment='quantity-input' className=' w-8 h-8 flex bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-e-lg focus:ring-gray-100  focus:ring-2 focus:outline-none'>
                                 <i className="fa-solid fa-plus mx-auto my-auto"></i>
                             </button>
                         </div>
 
                         <div className='pl-2 pr-3 py-1 h-full flex items-center'>
-                            <select value={currentFontFamily ? currentFontFamily : 'Times New Roman'} onChange={(e) => handleFontFamilyChange(e.target.value)}>
+                            <select defaultValue={currentFontFamily ? currentFontFamily : 'Times New Roman'} onChange={(e) => handleFontFamilyChange(e.target.value)}>
                                 {fonts?.map((family) => (
-                                    <option key={family} value={family} style={{fontFamily:family}}>
+                                    <option key={family} value={family} style={{ fontFamily: family }}>
                                         {family}
                                     </option>
                                 ))}

@@ -36,8 +36,8 @@ function App() {
           fontSize: 5,
           fill: 'black',
           image: '/assets/images/happyholiday.png',
-          type: 'text',
-          editable: false
+          type: 'textbox',
+          editable: true
         },
       ]
       const fontList = [
@@ -53,18 +53,24 @@ function App() {
         { fontName: 'Sansitype Script', fontFile: './assets/fonts/Sansitype_Script.otf' },
         { fontName: 'Master Of Break', fontFile: './assets/fonts/master_of_break.ttf' }
       ]
-      const size = {width:1024,heigh:640}
+      const size = {width:1024,height:640}
       const canvasEditorRef = useRef<CanvasEditorRef>(null);
-  
+      const jsonData = `{"version":"5.3.0","objects":[{"type":"i-text","version":"5.3.0","originX":"left","originY":"top","left":586.5,"top":308,"width":183.16,"height":40.68,"fill":"red","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"fontFamily":"Deja Vu","fontWeight":"normal","fontSize":36,"text":"Happy Holiday","underline":false,"overline":false,"linethrough":false,"textAlign":"left","fontStyle":"normal","lineHeight":1.16,"textBackgroundColor":"","charSpacing":0,"styles":[],"direction":"ltr","path":null,"pathStartOffset":0,"pathSide":"left","pathAlign":"baseline"},{"type":"i-text","version":"5.3.0","originX":"left","originY":"top","left":272.5,"top":474,"width":205.95,"height":27.12,"fill":"black","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"fontFamily":"Time New Roman","fontWeight":"normal","fontSize":24,"text":"Holiday in your heart","underline":false,"overline":false,"linethrough":false,"textAlign":"left","fontStyle":"normal","lineHeight":1.16,"textBackgroundColor":"","charSpacing":0,"styles":[],"direction":"ltr","path":null,"pathStartOffset":0,"pathSide":"left","pathAlign":"baseline"},{"type":"i-text","version":"5.3.0","originX":"left","originY":"top","left":690.5,"top":182,"width":183.16,"height":40.68,"fill":"red","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"fontFamily":"Deja Vu","fontWeight":"normal","fontSize":36,"text":"Happy Holiday","underline":false,"overline":false,"linethrough":false,"textAlign":"left","fontStyle":"normal","lineHeight":1.16,"textBackgroundColor":"","charSpacing":0,"styles":[],"direction":"ltr","path":null,"pathStartOffset":0,"pathSide":"left","pathAlign":"baseline"}],"background":"white"}`
       const handleGetCount = () => {
         if (canvasEditorRef.current) {
           console.log(canvasEditorRef.current.exportToJson());
         }
       };
+      const handleSizeCount = () => {
+        size.width = size.width+1;
+        console.log(size.width)
+      };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-row">
-      <CanvasEditor ref={canvasEditorRef} fontList={fontList} textList={textList} size={size} />
+      <CanvasEditor id='tass-canvas-editor' mode='edit' ref={canvasEditorRef} fontList={fontList} textList={textList} size={size} jsonData={jsonData} />
+      {/* <CanvasEditor ref={canvasEditorRef} jsonData={jsonData} mode='preview'/> */}
       <button onClick={handleGetCount}>Click</button>
+      <button onClick={handleSizeCount}>Click1</button>
     </div>
   );
 }

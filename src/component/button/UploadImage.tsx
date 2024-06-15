@@ -31,7 +31,7 @@ const UploadImageButton: React.FC<SaveToToolbarProps> = ({
         <div onClick={triggerColorInput}
             className="group relative flex justify-center rounded px-2 py-1.5"
         >
-            <input className="hidden" type="file" accept="image/*" ref={uploadImageInputRef} onChange={handleImageUpload} />
+            <input className="hidden" type="file" accept="image/*" ref={uploadImageInputRef} value={''} onChange={handleImageUpload} />
             <i className="fa-regular fa-upload"></i>
         </div>
     );

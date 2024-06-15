@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface PopupSidebarprop {
-    editingItem: fabric.IText | fabric.Image | null,
+    editingItem: fabric.Object | null,
     currentFabricCanvas: fabric.Canvas | undefined,
     popupPosition: { x: number; y: number }
 };
@@ -17,16 +17,6 @@ const PopupSidebar: React.FC<PopupSidebarprop> = ({
             currentFabricCanvas?.renderAll();
         }
     }
-    // const handleEdit = () => {
-    //     if (editingItem) {
-    //         if (editingItem.type === 'i-text') {
-    //             const target = editingItem as fabric.IText;
-    //             target.enterEditing();
-    //             target.hiddenTextarea?.focus();
-
-    //         }
-    //     }
-    // }
     return (
     <div className='rounded flex items-center shadow-lg border border-gray-200 text-gray-700'
         style={{
