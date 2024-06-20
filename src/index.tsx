@@ -8,23 +8,19 @@ export interface CanvasEditorRef {
   exportToJson: () => string;
 }
 interface CanvasEditorProps {
-  id?: string,
-  fontList?: SampleFont[] | [],
-  textList?: TextItem[] | [],
-  imageList?: ImageItem[] | [],
-  jsonData?: string,
-  mode?:string,
-  size?: { width: number, height: number }
+  options: {
+    id?: string,
+    fontList?: SampleFont[],
+    textList?: TextItem[],
+    imageList?: ImageItem[],
+    jsonData?: string,
+    mode: string,
+    size: { width: number, height: number },
+    mainClassName?:string
+  }
 }
 
-const CanvasEditor = forwardRef<CanvasEditorRef, CanvasEditorProps>(({
-  id = "",
-  fontList = [],
-  textList = [],
-  imageList = [],
-  jsonData = "",
-  mode = "edit",
-  size = { width: 1280, height: 720 } }, ref) => {
+const CanvasEditor = forwardRef<CanvasEditorRef, CanvasEditorProps>(({options}, ref) => {
   const fabricCanvasRef = useRef<FabricCanvasRef>(null);
   useImperativeHandle(ref, () => ({
     exportToJson() {
@@ -34,14 +30,20 @@ const CanvasEditor = forwardRef<CanvasEditorRef, CanvasEditorProps>(({
     }
   }));
   return (
-    <div>
+    <>
       {/* <Header /> */}
       <DragDropProvider>
-        <div className='flex flex-row'>
-          <FabricCanvas ref={fabricCanvasRef} listFonts={fontList} sampleTexts={textList} sampleImages={imageList} initData={jsonData} size={size} mode={mode} id={id}/>
-        </div>
+          <FabricCanvas ref={fabricCanvasRef} 
+            listFonts={options.fontList} 
+            sampleTexts={options.textList} 
+            sampleImages={options.imageList} 
+            initData={options.jsonData} 
+            size={options.size} 
+            mode={options.mode} 
+            id={options.id}
+            mainClassName={options.mainClassName} />
       </DragDropProvider>
-    </div>
+    </>
   )
 })
 

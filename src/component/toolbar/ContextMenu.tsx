@@ -46,7 +46,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
     };
     const handlePaste = () => {
         if (currentFabricCanvas && clipboard) {
-            parseSelectedObjects(clipboard, currentFabricCanvas)
+            // parseSelectedObjects(clipboard, currentFabricCanvas)
         }
     };
     

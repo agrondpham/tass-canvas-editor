@@ -1,6 +1,6 @@
 {
   "name": "tass-canvas-editor",
-  "version": "0.1.13",
+  "version": "0.1.16",
   "private": false,
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "webpack serve",
-    "build": "tsc",
+    "build": "tsc && npx tailwindcss -i ./src/index.css -o ./dist/index.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

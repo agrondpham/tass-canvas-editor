@@ -220,14 +220,14 @@ const Toolbar: React.FC<TextEditorProps> = ({
                             <button type='button' onClick={(e) => handleFontSizeChange(-1)} id='decrement-button' data-input-counter-decrement='quantity-input' className=' w-8 h-8 flex bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-s-lg focus:ring-gray-100  focus:ring-2 focus:outline-none'>
                                 <i className="fa-solid fa-minus  mx-auto my-auto"></i>
                             </button>
-                            <input type='text' id='quantity-input' data-input-counter aria-describedby='helper-text-explanation' className=' w-8 h-8 bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block py-2.5 ' defaultValue={currentFontSize ? currentFontSize : 20} required />
+                            <input type='text' id='quantity-input' data-input-counter aria-describedby='helper-text-explanation' className=' w-8 h-8 bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block py-2.5 '  value={currentFontSize ? currentFontSize : 20} required readOnly/>
                             <button type='button' onClick={(e) => handleFontSizeChange(+1)} id='increment-button' data-input-counter-increment='quantity-input' className=' w-8 h-8 flex bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-e-lg focus:ring-gray-100  focus:ring-2 focus:outline-none'>
                                 <i className="fa-solid fa-plus mx-auto my-auto"></i>
                             </button>
                         </div>
 
                         <div className='pl-2 pr-3 py-1 h-full flex items-center'>
-                            <select defaultValue={currentFontFamily ? currentFontFamily : 'Times New Roman'} onChange={(e) => handleFontFamilyChange(e.target.value)}>
+                            <select value={currentFontFamily ? currentFontFamily : 'Times New Roman'} onChange={(e) => handleFontFamilyChange(e.target.value)}>
                                 {fonts?.map((family) => (
                                     <option key={family} value={family} style={{ fontFamily: family }}>
                                         {family}

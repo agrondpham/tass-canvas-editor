@@ -6,45 +6,47 @@ import PopupSidebar from '../sidebar/PopupSidebar';
 import ItemType from '../common/ItemType';
 import ContextMenu from '../toolbar/ContextMenu';
 import { ImageItem, SampleFont, TextItem } from '../common/SampleData';
-import { IText } from 'fabric/fabric-impl';
-import { cloneMultipleObjects, deleteSelectedObjects, parseSelectedObjects } from '../common/FuncCopyParseDelete';
-import { functionAddElementToCanvas } from '../common/FuncFabricRenderEleement';
+import { deleteSelectedObjects, parseSelectedObjects } from '../common/FuncCopyParseDelete';
+import { functionAddElementToCanvas, functionLoadFont, functionLoadJsonToCanvas } from '../common/FuncFabricRenderEleement';
 
 export interface FabricCanvasRef {
     exportToJson: () => string;
 }
 
 interface FabricCanvasProp {
-    id: string,
-    initData: string,
-    sampleTexts: TextItem[],
-    sampleImages: ImageItem[],
-    listFonts: SampleFont[],
+    id?: string,
+    initData?: string,
+    sampleTexts?: TextItem[],
+    sampleImages?: ImageItem[],
+    listFonts?: SampleFont[],
     mode: string,
     size: { width: number, height: number },
+    mainClassName?: string
 }
 
 
 const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     id,
     initData,
-    sampleTexts,
-    listFonts,
-    sampleImages,
+    sampleTexts = [],
+    listFonts = [],
+    sampleImages = [],
     mode,
     size,
+    mainClassName = '',
 }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas>();
     const [editingItem, setEditingItem] = useState<fabric.Object | null>(null);
     const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | null>(null);
     const [fontList, setFontList] = useState<string[]>();
+    const [canvasFonts, setCanvasFonts] = useState<SampleFont[]>(listFonts);
     const [selectedItem, setSelectedItem] = useState<object | null>(null);
-    const [canvasWidth, setCanvasWidth] = useState<number>(size.width);
-    const [canvasHeight, setCanvasHeight] = useState<number>(size.height);
     const [showDropdown, setShowDropdown] = useState<string>('');
+    // const [reloadData, setReloadData] = useState<string | undefined>(initData);
     const [contextMenu, setContextMenu] = useState<{ x: number; y: number; show: boolean }>({ x: 0, y: 0, show: false });
     const [clipboard, setClipboard] = useState<fabric.Object[] | null>(null);
+    const [finishLoad, setFinishLoad] = useState<boolean>(false);
     const clear = () => {
         setEditingItem(null);
         setPopupPosition(null);
@@ -65,7 +67,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
             const activeObjects = fabricCanvasRef.current.getActiveObjects();
             if (event.ctrlKey && event.key === 'c' && activeObjects) {
                 // cloneMultipleObjects(activeObjects).then(clonedObjects => {
-                    setClipboard(activeObjects);
+                setClipboard(activeObjects);
                 //   });
             } else if (event.ctrlKey && event.key === 'v' && clipboard) {
                 parseSelectedObjects(clipboard, fabricCanvasRef.current)
@@ -78,6 +80,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     };
     useEffect(() => {
         if (canvasRef.current) {
+            console.log('first run')
             fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
                 selection: true,
                 fireRightClick: true,  // <-- enable firing of right click events
@@ -85,6 +88,16 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
                 stopContextMenu: true,
                 preserveObjectStacking: true
             });
+            fabricCanvasRef.current.setWidth(size.width)
+            fabricCanvasRef.current.setHeight(size.height)
+            functionLoadFont(canvasFonts, (fonts) => {
+                setFontList(fonts);
+                // setReloadData(initData!)
+                //load first time
+                functionLoadJsonToCanvas(fabricCanvasRef.current!, initData, mode)
+                setFinishLoad(true)
+            })
+            fabricCanvasRef.current.renderAll();
         }
         return () => {
             if (fabricCanvasRef.current)
@@ -92,51 +105,29 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
         };
     }, []);
     useEffect(() => {
-        // Set fonts 
-        let fonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'];
-        //custom icon
-        const fontPromises = listFonts.map((e) => {
-            const font = new FontFace(e.fontName, `url(${e.fontFile})`);
-            return font.load().then((loadedFont) => {
-                // Add the font to the document
-                (document.fonts as any).add(loadedFont);
-                fonts.push(e.fontName);
-            }).catch((error) => {
-                console.error('Failed to load font:', error);
-            });
-        });
-
-        Promise.all(fontPromises).then(() => {
-            setFontList(fonts);
-            if (fabricCanvasRef.current)
-                if (initData) {
-                    fabricCanvasRef.current.loadFromJSON(JSON.parse(initData), () => {
-                        if (fabricCanvasRef.current && mode === 'preview') {
-                            fabricCanvasRef.current.renderAll();
-                            // Set all objects to not selectable
-                            fabricCanvasRef.current.getObjects().forEach(function (obj) {
-                                obj.selectable = false;
-                            });
-                            fabricCanvasRef.current.selection = false;
-                        }
-                        fabricCanvasRef.current?.renderAll();
-                    });
-                } else {
-                    fabricCanvasRef.current.setBackgroundColor('white', () => {
-                        fabricCanvasRef.current?.renderAll();
-                    });
-                }
-        });
-    }, [listFonts, initData, mode]);
+        if (fabricCanvasRef.current && finishLoad) {
+            console.log('load font')
+            functionLoadFont(canvasFonts, (fonts) => {
+                setFontList(fonts);
+            })
+        }
+    }, [canvasFonts]);
+    useEffect(() => {
+        console.log('load json pretest')
+        if (fabricCanvasRef.current && finishLoad) {
+            console.log('load Json to Canvas')
+            functionLoadJsonToCanvas(fabricCanvasRef.current!, initData, mode)
+        }
+    }, [mode, initData]);
     useEffect(() => {
         if (fabricCanvasRef.current) {
             //internal function for update possition
-            const updatePosition = (activeObject: fabric.Object) => {
-                setEditingItem(activeObject);
+            const updatePosition = (activeObject: fabric.Object[]) => {
+                setEditingItem(activeObject[0]);
                 const boundingRect = canvasRef.current!.getBoundingClientRect();
                 setPopupPosition({
-                    x: activeObject.left! + boundingRect.left,
-                    y: activeObject.top! + boundingRect.top - 60,//activeObject.height!,
+                    x: activeObject[0].left! + boundingRect.left,
+                    y: activeObject[0].top! + boundingRect.top - 60,//activeObject.height!,
                 });
             }
             //internal handler for right click
@@ -153,14 +144,14 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
             //internal handler for select
             const handleSelection = (e: fabric.IEvent) => {
                 clear();
-                const target = fabricCanvasRef.current?.getActiveObject();
+                const target = fabricCanvasRef.current?.getActiveObjects();
                 if (target) {
                     updatePosition(target)
 
-                    if (target.canvas) {
-                        target.moveTo(target.canvas.getObjects().indexOf(target));
-                        // console.log(target.canvas.getObjects().indexOf(target))
-                    }
+                    // if (target.canvas) {
+                    //     target.moveTo(target.canvas.getObjects().indexOf(target));
+                    //     // console.log(target.canvas.getObjects().indexOf(target))
+                    // }
                 }
 
             };
@@ -184,11 +175,12 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
         }
     }, [editingItem]);
     useEffect(() => {
-        setCanvasHeight(size.height)
-        setCanvasWidth(size.width)
+        if (fabricCanvasRef.current && finishLoad) {
+            console.log('Change size')
+            fabricCanvasRef.current.setWidth(size.width)
+            fabricCanvasRef.current.setHeight(size.height)
+        }
     }, [size]);
-
-
     useEffect(() => {
         const handleCanvasClick = (e: fabric.IEvent) => {
             const pointer = fabricCanvasRef.current?.getPointer(e.e);
@@ -233,41 +225,37 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
 
     return (
         <>
-            <div className='w-full flex flex-col'>
-                <div ref={drop} className='mx-auto my-auto'>
-                    {/* <div className='mx-auto my-auto'> */}
-                    {mode === 'edit' && (<Toolbar
-                        editingItem={editingItem}
-                        currentFabricCanvas={fabricCanvasRef.current}
-                        fonts={fontList}
-                        sampleTexts={sampleTexts}
-                        sampleImages={sampleImages}
-                        setSelectedItem={setSelectedItem}
-                        setShowDropdown={setShowDropdown}
-                        showDropdown={showDropdown}
-                    />)}
-                    <div className="rounded shadow-lg border border-gray-200 ">
-                        <canvas id={id} ref={canvasRef} width={canvasWidth} height={canvasHeight} />
-                    </div>
-                </div>
-                {mode === 'edit' && (<>{popupPosition && (
-                    <PopupSidebar
-                        editingItem={editingItem}
-                        currentFabricCanvas={fabricCanvasRef.current}
-                        popupPosition={popupPosition}
-                    />
-                )}
-                    <ContextMenu
-                        currentFabricCanvas={fabricCanvasRef.current}
-                        x={contextMenu.x}
-                        y={contextMenu.y}
-                        show={contextMenu.show}
-                        onClose={() => setContextMenu({ ...contextMenu, show: false })}
-                        clipboard={clipboard}
-                        setClipboard={setClipboard}
-                    /></>)}
 
+            <div ref={drop} className='mx-auto my-auto'>
+                {/* <div className='mx-auto my-auto'> */}
+                {mode === 'edit' && (<Toolbar
+                    editingItem={editingItem}
+                    currentFabricCanvas={fabricCanvasRef.current}
+                    fonts={fontList}
+                    sampleTexts={sampleTexts}
+                    sampleImages={sampleImages}
+                    setSelectedItem={setSelectedItem}
+                    setShowDropdown={setShowDropdown}
+                    showDropdown={showDropdown}
+                />)}
+                <canvas id={id} ref={canvasRef} className="rounded shadow-lg border border-gray-200 " />
             </div>
+            {mode === 'edit' && (<>{popupPosition && (
+                <PopupSidebar
+                    editingItem={editingItem}
+                    currentFabricCanvas={fabricCanvasRef.current}
+                    popupPosition={popupPosition}
+                />
+            )}
+                <ContextMenu
+                    currentFabricCanvas={fabricCanvasRef.current}
+                    x={contextMenu.x}
+                    y={contextMenu.y}
+                    show={contextMenu.show}
+                    onClose={() => setContextMenu({ ...contextMenu, show: false })}
+                    clipboard={clipboard}
+                    setClipboard={setClipboard}
+                /></>)}
         </>
     );
 });

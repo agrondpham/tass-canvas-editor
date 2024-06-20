@@ -17,7 +17,7 @@ const ColorButton: React.FC<ColorButtonProps> = ({
 
     return (
         <div>
-            <input type='color' ref={colorInputRef} defaultValue={currentColor} onChange={changeColor} style={{ width:0,height:0 }}></input>
+            <input type='color' ref={colorInputRef} value={currentColor} onChange={changeColor} style={{ width:0,height:0 }}></input>
             <i className='fa-regular fa-palette' onClick={triggerColorInput} ></i>
         </div>)
 }
