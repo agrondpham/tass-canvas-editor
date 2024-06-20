@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import CanvasEditor, { CanvasEditorRef } from '../src/index';
 
+import template1 from './assets/json/template-1.json'
+
 function App() {
     const textList = [
         {
@@ -73,6 +75,9 @@ function App() {
       const handleCount = () => {
         setData(jsonData2)
       };
+      const changeJson = (dataJson: any) => {
+        setData(JSON.stringify(dataJson))
+      }
       const options= {
         id: 'tass-canvas-editor',
         fontList: fontList,
@@ -88,6 +93,7 @@ function App() {
       <button onClick={handleGetCount}>Click</button>
       <button onClick={handleSizeCount}>Click1</button>
       <button onClick={handleCount}>Click2</button>
+      <button onClick={() => changeJson(template1)}>Json1</button>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
   "name": "tass-canvas-editor",
-  "version": "0.1.16",
+  "version": "0.1.21",
   "private": false,
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

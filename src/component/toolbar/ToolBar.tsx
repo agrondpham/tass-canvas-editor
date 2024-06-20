@@ -163,7 +163,7 @@ const Toolbar: React.FC<TextEditorProps> = ({
     }, [editingItem]);
 
     return (
-        <div className='flex grap-2 py-2'>
+        <div className='flex grap-2 py-2 absolute -top-1 left-0'>
             <div className='rounded flex items-center shadow-lg border border-gray-200 text-gray-700 bg-white py-2'>
                 {showDropdown ==='text'&& sampleTexts.length>0 && (
                     <div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 mt-14 absolute top-0 z-10">

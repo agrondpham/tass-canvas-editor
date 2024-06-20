@@ -10,6 +10,7 @@
     "strict": true,
     "jsx": "react",
     "declaration": true,
+    "resolveJsonModule": true,
     "outDir": "dist"
   },
   "include": [

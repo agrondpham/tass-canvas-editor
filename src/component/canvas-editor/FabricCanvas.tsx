@@ -226,7 +226,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     return (
         <>
 
-            <div ref={drop} className='mx-auto my-auto'>
+            <div ref={drop} className='mx-auto my-auto relative pt-14'>
                 {/* <div className='mx-auto my-auto'> */}
                 {mode === 'edit' && (<Toolbar
                     editingItem={editingItem}
