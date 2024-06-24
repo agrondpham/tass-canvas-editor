@@ -76,7 +76,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(
       y: number;
       show: boolean;
     }>({ x: 0, y: 0, show: false });
-    const [clipboard, setClipboard] = useState<fabric.Object>();
+    const [clipboard, setClipboard] = useState<fabric.Object[]>();
     const [finishLoad, setFinishLoad] = useState<boolean>(false);
     const clear = () => {
       setEditingItem(null);
@@ -95,17 +95,14 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(
     const handleKeyDown = (event: KeyboardEvent) => {
       if (fabricCanvasRef.current) {
         //get all selected Object
-        if (
-          ((event.ctrlKey && !isMacOs()) || (event.metaKey && isMacOs())) &&
-          (event.key === "c" || event.key === "C")
-        ) {
-          fabricCanvasRef.current
-            .getActiveObject()
-            ?.clone(
-              (cloned: React.SetStateAction<fabric.Object | undefined>) => {
-                setClipboard(cloned);
-              }
-            );
+        if (((event.ctrlKey && !isMacOs()) || (event.metaKey && isMacOs())) && (event.key === "c" || event.key === "C")) {
+            let dataCloned: fabric.Object[]  = []
+            fabricCanvasRef.current.getActiveObjects().forEach(item => {
+                item?.clone((cloned: fabric.Object | undefined) => {
+                    cloned && dataCloned.push(cloned);
+                });
+            })
+            setClipboard(dataCloned)
         } else if (
           ((event.ctrlKey && !isMacOs()) || (event.metaKey && isMacOs())) &&
           (event.key === "v" || event.key === "V")

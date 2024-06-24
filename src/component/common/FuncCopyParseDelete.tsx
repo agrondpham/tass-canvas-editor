@@ -1,57 +1,39 @@
+import { fabric } from "fabric";
+
 export const deleteSelectedObjects = (canvas: fabric.Canvas) => {
     const activeObjects = canvas.getActiveObjects();
     activeObjects.forEach(obj => canvas.remove(obj));
     canvas.discardActiveObject();
     canvas.requestRenderAll();
 };
-export const parseSelectedObjects = (clipboard: fabric.Object, canvas: fabric.Canvas) => {
-    clipboard.clone((clonedObj: fabric.Object) => {
-        if (clonedObj.type === 'activeSelection') {
-            // active selection needs a reference to the canvas.
-            let objectActives = canvas.getActiveObjects()
-            canvas.discardActiveObject()
-            objectActives?.forEach(function(obj: fabric.Object) {
-                obj.clone((cloned: fabric.Object) => {
-                    cloned.set({
-                        left: (obj.left || 0) + 10,
-                        top: (obj.top || 0) + 10,
-                        evented: true,
-                    });
-                    canvas.add(cloned);
-                    
-                })
-            });
-        } else {
+export const parseSelectedObjects = (clipboard: fabric.Object[], canvas: fabric.Canvas) => {
+    if(clipboard.length === 1) {
+        canvas.discardActiveObject();
+        clipboard[0].clone((clonedObj: fabric.Object) => {
             clonedObj.set({
                 left: (clonedObj.left || 0) + 10,
                 top: (clonedObj.top || 0) + 10,
                 evented: true,
             });
             canvas.add(clonedObj);
-            canvas.discardActiveObject();
+            
             canvas.setActiveObject(clonedObj);
-        }
-       
-        canvas.requestRenderAll();
-    })
+        })
+    } else {
+        let objectActive = canvas.getActiveObject()
+        let group = new fabric.Group()
+        canvas.discardActiveObject();
+        clipboard.forEach(item => {
+            item.clone((clonedObj: fabric.Object) => {
+                group.addWithUpdate(clonedObj)
+            })
+        })
+        group.set({
+            left: (objectActive?.left || 0) + 10,
+            top: (objectActive?.top || 0) + 10,
+        })
+        canvas.add(group)
+        canvas.setActiveObject(group);
+    }
+    canvas.requestRenderAll();
 };
-// // Utility function to clone a single object
-// export const cloneObject = (object: fabric.Object): Promise<fabric.Object> => {
-//     return new Promise((resolve, reject) => {
-//       object.clone((clonedObj: fabric.Object) => {
-//         if (clonedObj) {
-//           resolve(clonedObj);
-//         } else {
-//           reject(new Error('Cloning failed'));
-//         }
-//       });
-//     });
-//   };
-  
-//   // Utility function to clone multiple objects
-//   export const cloneMultipleObjects = (objects: fabric.Object[]): Promise<fabric.Object[]> => {
-//     return Promise.all(objects.map(obj => cloneObject(obj).then(cloned => {
-//       cloned.set({ left: obj.left! + 10, top: obj.top! + 10 });
-//       return cloned;
-//     })));
-//   };

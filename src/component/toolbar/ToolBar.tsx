@@ -52,6 +52,8 @@ const Toolbar: React.FC<TextEditorProps> = ({
                 item.set('fontSize', currentFontSize + size);
                 currentFabricCanvas?.renderAll();
                 setCurrentFontSize(currentFontSize + size);
+                // trigger event object:modified
+                currentFabricCanvas?.fire('object:modified', {target: item});
             }
         }
     };
@@ -62,6 +64,8 @@ const Toolbar: React.FC<TextEditorProps> = ({
                 item.set('fontFamily', family);
                 currentFabricCanvas?.renderAll();
                 setCurrentFontFamily(family)
+                // trigger event object:modified
+                currentFabricCanvas && currentFabricCanvas?.fire('object:modified', {target: item});
             }
         }
     };
@@ -71,14 +75,26 @@ const Toolbar: React.FC<TextEditorProps> = ({
             item.set('fill', e.target.value);
             currentFabricCanvas?.renderAll();
             setCurrentColor(e.target.value)
+           
         }
     }
+
+    const changeColorCompleted = () => {
+        if (editingItem && (editingItem.type === 'textbox' || editingItem.type === 'i-text')) {
+            const item = editingItem as fabric.Textbox
+            // trigger event object:modified
+            currentFabricCanvas?.fire('object:modified', {target: item});
+        }
+    }
+
     const handleTextAlign = (align: string) => {
         if (editingItem && (editingItem.type === 'textbox' || editingItem.type === 'i-text')) {
             const item = editingItem as fabric.Textbox
             item.set('textAlign', align);
             currentFabricCanvas?.renderAll();
             setTextAlign(align)
+            // trigger event object:modified
+            currentFabricCanvas?.fire('object:modified', {target: item});
         }
     }
     const handleTextStyle = (type: string) => {
@@ -131,6 +147,8 @@ const Toolbar: React.FC<TextEditorProps> = ({
 
             }
             currentFabricCanvas?.renderAll();
+            // trigger event object:modified
+            currentFabricCanvas?.fire('object:modified', {target: item});
         }
 
     }
@@ -251,7 +269,7 @@ const Toolbar: React.FC<TextEditorProps> = ({
                             <i className='fa-regular fa-font-case mx-auto my-auto'></i>
                         </div>
                         <div className=' w-8 h-8 px-2 cursor-pointer select-none hover:bg-gray-200 py-1'>
-                            <ColorButton changeColor={changeColor} currentColor={currentColor ? currentColor : '#000000'} />
+                            <ColorButton changeColor={changeColor} changeColorCompleted={changeColorCompleted} currentColor={currentColor ? currentColor : '#000000'} />
                         </div>
                         <div onClick={() => handleTextAlign('justify')} className={`${textAlign === 'justify' ? 'bg-gray-300' : 'bg-gray'} mx-1 w-8 h-8 cursor-pointer select-none hover:bg-gray-200 flex rounded`}>
                             <i className='fa-regular fa-align-justify mx-auto my-auto'></i>

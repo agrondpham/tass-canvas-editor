@@ -70,7 +70,7 @@ const PopupSidebar: React.FC<PopupSidebarprop> = ({
             <div
                 className='bg-gray w-9 h-9 cursor-pointer select-none hover:text-blue-500 flex rounded'
                 onClick={handleLock}>
-                <i className={`fa-light mx-auto my-auto ${!isLock ? 'fa-lock-open' : 'fa-lock'}`} />
+                <i className={`fa-regular mx-auto my-auto ${!isLock ? 'fa-lock-open' : 'fa-lock'}`} />
             </div>
         </div>
     );

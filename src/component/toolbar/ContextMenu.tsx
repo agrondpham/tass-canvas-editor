@@ -7,8 +7,8 @@ type ContextMenuProps = {
     y: number;
     show: boolean;
     onClose: () => void;
-    clipboard: fabric.Object | undefined
-    setClipboard: React.Dispatch<React.SetStateAction<fabric.Object | undefined>>
+    clipboard: fabric.Object[] | undefined
+    setClipboard: React.Dispatch<React.SetStateAction<fabric.Object[] | undefined>>
 };
 const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose, clipboard, setClipboard }) => {
     // const [clipboard, setClipboard] = useState<fabric.Object | null>(null);
@@ -35,8 +35,11 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
     };
     const handleCopy = () => {
         if (currentFabricCanvas) {
-                currentFabricCanvas.getActiveObject()?.clone((cloned: React.SetStateAction<Object | undefined>) => setClipboard(cloned))
-            
+            let dataCloned: fabric.Object[] = []
+            currentFabricCanvas.getActiveObjects().forEach(item => {
+                item.clone((cloned: Object | undefined) => cloned && dataCloned.push(cloned))
+            })
+            setClipboard(dataCloned)
         }
     };
     const handleDelete = () => {
