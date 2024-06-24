@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { deleteSelectedObjects, parseSelectedObjects } from '../common/FuncCopyParseDelete';
+import { Object } from 'fabric/fabric-impl';
 type ContextMenuProps = {
     currentFabricCanvas: fabric.Canvas | undefined,
     x: number;
     y: number;
     show: boolean;
     onClose: () => void;
+    clipboard: fabric.Object | undefined
+    setClipboard: React.Dispatch<React.SetStateAction<fabric.Object | undefined>>
 };
-const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose }) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose, clipboard, setClipboard }) => {
     // const [clipboard, setClipboard] = useState<fabric.Object | null>(null);
 
     if (!show) return null;
@@ -32,8 +35,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
     };
     const handleCopy = () => {
         if (currentFabricCanvas) {
-            const activeObject = currentFabricCanvas.getActiveObjects();
-                // setClipboard(activeObject);
+                currentFabricCanvas.getActiveObject()?.clone((cloned: React.SetStateAction<Object | undefined>) => setClipboard(cloned))
             
         }
     };
@@ -43,9 +45,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
         }
     };
     const handlePaste = () => {
-        // if (currentFabricCanvas && clipboard) {
-            // parseSelectedObjects(clipboard, currentFabricCanvas)
-        // }
+        if (currentFabricCanvas && clipboard) {
+            parseSelectedObjects(clipboard, currentFabricCanvas)
+        }
     };
     
 

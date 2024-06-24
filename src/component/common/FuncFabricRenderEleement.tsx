@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 import { ImageItem, SampleFont, TextItem } from './SampleData';
 import { IText } from 'fabric/fabric-impl';
+import { FabricCanvasCustom } from '../canvas-editor/FabricCanvas';
 interface CommonDragDropItem {
     data: string,
     type: string
@@ -69,7 +70,7 @@ export const functionAddElementToCanvas = (pointer: { x: number, y: number }, ca
 
 }
 
-export const functionLoadJsonToCanvas = (canvas: fabric.Canvas, jsonData: string | undefined, mode: string) => {
+export const functionLoadJsonToCanvas = (canvas: FabricCanvasCustom, jsonData: string | undefined, mode: string) => {
     if (jsonData) {
         canvas.loadFromJSON(JSON.parse(jsonData), () => {
             if (canvas && mode === 'preview') {

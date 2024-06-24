@@ -4,31 +4,7 @@ export const deleteSelectedObjects = (canvas: fabric.Canvas) => {
     canvas.discardActiveObject();
     canvas.requestRenderAll();
 };
-export const parseSelectedObjects = (clipboard: fabric.Object[], canvas: fabric.Canvas) => {
-    const top = clipboard[0].top;
-    const left = clipboard[0].left;
-    console.log("top" + top);
-    console.log("lef" + left);
-    clipboard.forEach(clonedObj => {
-        if (canvas) {
-            // canvas.discardActiveObject();
-            clonedObj.clone((cloned: fabric.Object) => {
-                if (canvas) {
-                  // const boundingRect = canvasRef.getBoundingClientRect();
-
-                    cloned.set({ 
-                      left: clonedObj.left! + 10, 
-                      top: clonedObj.top! + 10
-                    });
-                    canvas.add(cloned);
-                    // canvas.setActiveObject(cloned);
-                }
-            });
-        }
-    });
-    canvas.requestRenderAll();
-};
-export const parseObjects = (clipboard: fabric.Object, canvas: fabric.Canvas) => {
+export const parseSelectedObjects = (clipboard: fabric.Object, canvas: fabric.Canvas) => {
     clipboard.clone((clonedObj: fabric.Object) => {
         if (clonedObj.type === 'activeSelection') {
             // active selection needs a reference to the canvas.
