@@ -28,6 +28,37 @@ export const parseSelectedObjects = (clipboard: fabric.Object[], canvas: fabric.
     });
     canvas.requestRenderAll();
 };
+export const parseObjects = (clipboard: fabric.Object, canvas: fabric.Canvas) => {
+    clipboard.clone((clonedObj: fabric.Object) => {
+        if (clonedObj.type === 'activeSelection') {
+            // active selection needs a reference to the canvas.
+            let objectActives = canvas.getActiveObjects()
+            canvas.discardActiveObject()
+            objectActives?.forEach(function(obj: fabric.Object) {
+                obj.clone((cloned: fabric.Object) => {
+                    cloned.set({
+                        left: (obj.left || 0) + 10,
+                        top: (obj.top || 0) + 10,
+                        evented: true,
+                    });
+                    canvas.add(cloned);
+                    
+                })
+            });
+        } else {
+            clonedObj.set({
+                left: (clonedObj.left || 0) + 10,
+                top: (clonedObj.top || 0) + 10,
+                evented: true,
+            });
+            canvas.add(clonedObj);
+            canvas.discardActiveObject();
+            canvas.setActiveObject(clonedObj);
+        }
+       
+        canvas.requestRenderAll();
+    })
+};
 // // Utility function to clone a single object
 // export const cloneObject = (object: fabric.Object): Promise<fabric.Object> => {
 //     return new Promise((resolve, reject) => {

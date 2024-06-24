@@ -6,7 +6,7 @@ import PopupSidebar from '../sidebar/PopupSidebar';
 import ItemType from '../common/ItemType';
 import ContextMenu from '../toolbar/ContextMenu';
 import { ImageItem, SampleFont, TextItem } from '../common/SampleData';
-import { deleteSelectedObjects, parseSelectedObjects } from '../common/FuncCopyParseDelete';
+import { deleteSelectedObjects, parseObjects } from '../common/FuncCopyParseDelete';
 import { functionAddElementToCanvas, functionLoadFont, functionLoadJsonToCanvas } from '../common/FuncFabricRenderEleement';
 
 export interface FabricCanvasRef {
@@ -24,7 +24,6 @@ interface FabricCanvasProp {
     mainClassName?: string
 }
 
-
 const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     id,
     initData,
@@ -33,7 +32,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     sampleImages = [],
     mode,
     size,
-    mainClassName = '',
+    mainClassName = 'mx-auto my-auto relative pt-14',
 }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas>();
@@ -45,7 +44,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     const [showDropdown, setShowDropdown] = useState<string>('');
     // const [reloadData, setReloadData] = useState<string | undefined>(initData);
     const [contextMenu, setContextMenu] = useState<{ x: number; y: number; show: boolean }>({ x: 0, y: 0, show: false });
-    const [clipboard, setClipboard] = useState<fabric.Object[] | null>(null);
+    const [clipboard, setClipboard] = useState<fabric.Object>();
     const [finishLoad, setFinishLoad] = useState<boolean>(false);
     const clear = () => {
         setEditingItem(null);
@@ -64,14 +63,16 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
     const handleKeyDown = (event: KeyboardEvent) => {
         if (fabricCanvasRef.current) {
             //get all selected Object
-            const activeObjects = fabricCanvasRef.current.getActiveObjects();
-            if (event.ctrlKey && event.key === 'c' && activeObjects) {
-                // cloneMultipleObjects(activeObjects).then(clonedObjects => {
-                setClipboard(activeObjects);
-                //   });
-            } else if (event.ctrlKey && event.key === 'v' && clipboard) {
-                parseSelectedObjects(clipboard, fabricCanvasRef.current)
-            } else if (event.key === 'Delete' && activeObjects) {
+            if ((event.ctrlKey || event.metaKey) && (event.key === 'c' || event.key === 'C')) {
+                fabricCanvasRef.current.getActiveObject()?.clone((cloned: React.SetStateAction<fabric.Object | undefined>) => {
+                    setClipboard(cloned)
+                })
+                
+            } else if ((event.ctrlKey || event.metaKey) && (event.key === 'v' || event.key === 'V')) {
+                if(clipboard) {
+                    parseObjects(clipboard, fabricCanvasRef.current)
+                }
+            } else if (event.key === 'Delete' && fabricCanvasRef.current.getActiveObjects()) {
                 deleteSelectedObjects(fabricCanvasRef.current)
             }
 
@@ -225,8 +226,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
 
     return (
         <>
-
-            <div ref={drop} className='mx-auto my-auto relative pt-14'>
+            <div ref={drop} className={mainClassName}>
                 {/* <div className='mx-auto my-auto'> */}
                 {mode === 'edit' && (<Toolbar
                     editingItem={editingItem}
@@ -253,8 +253,6 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProp>(({
                     y={contextMenu.y}
                     show={contextMenu.show}
                     onClose={() => setContextMenu({ ...contextMenu, show: false })}
-                    clipboard={clipboard}
-                    setClipboard={setClipboard}
                 /></>)}
         </>
     );

@@ -6,10 +6,8 @@ type ContextMenuProps = {
     y: number;
     show: boolean;
     onClose: () => void;
-    clipboard: fabric.Object[] | null
-    setClipboard:(data:fabric.Object[])=>void
 };
-const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose,clipboard,setClipboard }) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, show, onClose }) => {
     // const [clipboard, setClipboard] = useState<fabric.Object | null>(null);
 
     if (!show) return null;
@@ -35,7 +33,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
     const handleCopy = () => {
         if (currentFabricCanvas) {
             const activeObject = currentFabricCanvas.getActiveObjects();
-                setClipboard(activeObject);
+                // setClipboard(activeObject);
             
         }
     };
@@ -45,9 +43,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ currentFabricCanvas, x, y, sh
         }
     };
     const handlePaste = () => {
-        if (currentFabricCanvas && clipboard) {
+        // if (currentFabricCanvas && clipboard) {
             // parseSelectedObjects(clipboard, currentFabricCanvas)
-        }
+        // }
     };
     
 
